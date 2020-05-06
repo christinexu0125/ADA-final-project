@@ -1,0 +1,209 @@
+---
+title: "Final project code"
+author: "Christine Xu"
+date: "4/21/2020"
+output: html_document
+---
+
+```{r}
+# input Stata file
+library(foreign)
+nsduh <- read.dta("nsduh_ada_12.dta")
+summary(nsduh)
+
+#chage all variables to categorial varialbes
+nsduh$year<- as.factor(nsduh$year)
+nsduh$cigyr <- as.factor(nsduh$cigyr)
+
+#omitting NA's in the data set (Complete case analysis)
+nsduh <-na.omit(nsduh)
+summary(nsduh)
+```
+
+#Table 1 Sample characteristics
+```{r}
+#gender
+male<-table(nsduh$mal)
+addmargins(male) 
+prop.table(male)
+
+#race
+race<-table(nsduh$race)
+addmargins(race) 
+prop.table(race)
+
+#age
+age<-table(nsduh$CATAG7)
+addmargins(age) 
+prop.table(age)
+
+#income
+income<-table(nsduh$income)
+addmargins(income) 
+prop.table(income)
+
+#12-month MDE
+mde<-table(nsduh$ymdeyr)
+addmargins(mde) 
+prop.table(mde)
+
+#12-month cigarette use
+smoking<-table(nsduh$cigyr)
+addmargins(smoking) 
+prop.table(smoking)
+
+#12-month opioid use
+opioid<-table(nsduh$opioidmis_pastyear)
+addmargins(opioid) 
+prop.table(opioid)
+ 
+#12-month marijuana use
+marijuana<-table(nsduh$mrjyr)
+addmargins(marijuana) 
+prop.table(marijuana)
+
+#current binge alcohol use
+alcohol<-table(nsduh$bingedrk_pastmo)
+addmargins(alcohol) 
+prop.table(alcohol)
+```
+
+#Figure 1. Observed prevalence trend of depression and smoking from 2008 to 2018 
+```{r}
+#Prevalence trend of depression
+depression_year<-table(nsduh$ymdey, nsduh$year)
+depression_year
+
+margin.table(depression_year, 1) # A frequencies (summed over B)
+margin.table(depression_year, 2) # B frequencies (summed over A)
+prop.table(depression_year, 2) # column percentages
+
+#Prevalence trend of smoking
+smoking_year<-table(nsduh$cigyr, nsduh$year)
+smoking_year
+
+margin.table(smoking_year, 1) 
+margin.table(smoking_year, 2) 
+prop.table(smoking_year, 2) # column percentages
+```
+
+#Table 2 Logistic regression
+```{r}
+# Logistic regression for the association between depression and smoking without smoking*year interaction
+deplogit01 <- glm(ymdeyr ~ cigyr+year,family="binomial",data=nsduh)
+summary(deplogit01)
+
+
+# Logistic regression for the association between depression and smoking with smoking*year interaction
+deplogit02 <- glm(ymdeyr ~ cigyr+year+cigyr*year,family="binomial",data=nsduh)
+summary(deplogit02)
+
+#calculate and print ORs and 95% CIs  
+  depOR<-exp(cbind(OR = coef(deplogit02), confint(deplogit02))) #calculate ORs and 95% CIs
+  depOR #print ORs and 95% CIs
+  
+#Log Likelihood
+  
+logLik(deplogit01)
+logLik(deplogit02)
+
+
+#compare models without smoking*year interaction to that with smoking*year interaction using LR test
+install.packages("lmtest")
+library(lmtest)
+
+lrtest(deplogit01, deplogit02)
+```
+```
+
+#Figure 2. Observed odds ratios for the association between past 12-month cigarette use and MDE of each year from 2008 to 2018.
+```{r}
+#subgroup analysis of each year 
+#2008
+nsduh2008 <- nsduh[ which(nsduh$year=='2008'),]
+summary(nsduh2008$year)
+dep2008logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2008)
+summary(deplogit)
+  dep2008OR<-exp(cbind(OR = coef(dep2008logit), confint(dep2008logit))) 
+  dep2008OR 
+
+#2009
+nsduh2009 <- nsduh[ which(nsduh$year=='2009'),]
+summary(nsduh2009$year)
+dep2009logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2009)
+summary(deplogit)
+  dep2009OR<-exp(cbind(OR = coef(dep2009logit), confint(dep2009logit))) 
+  dep2009OR 
+  
+#2010
+nsduh2010 <- nsduh[ which(nsduh$year=='2010'),]
+summary(nsduh2010$year)
+dep2010logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2010)
+summary(deplogit)
+  dep2010OR<-exp(cbind(OR = coef(dep2010logit), confint(dep2010logit)))
+  dep2010OR 
+
+#2011
+nsduh2011 <- nsduh[ which(nsduh$year=='2011'),]
+summary(nsduh2011$year)
+dep2011logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2011)
+summary(deplogit)
+  dep2011OR<-exp(cbind(OR = coef(dep2011logit), confint(dep2011logit))) 
+  dep2011OR 
+
+#2012
+nsduh2012 <- nsduh[ which(nsduh$year=='2012'),]
+summary(nsduh2012$year)
+dep2012logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2012)
+summary(deplogit)
+  dep2012OR<-exp(cbind(OR = coef(dep2012logit), confint(dep2012logit))) 
+  dep2012OR 
+
+#2013
+nsduh2013 <- nsduh[ which(nsduh$year=='2013'),]
+summary(nsduh2013$year)
+dep2013logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2013)
+summary(deplogit)
+  dep2013OR<-exp(cbind(OR = coef(dep2013logit), confint(dep2013logit)))
+  dep2013OR 
+  
+#2014
+nsduh2014 <- nsduh[ which(nsduh$year=='2014'),]
+summary(nsduh2014$year)
+dep2014logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2014)
+summary(deplogit)
+  dep2014OR<-exp(cbind(OR = coef(dep2014logit), confint(dep2014logit)))
+  dep2014OR
+
+#2015
+nsduh2015 <- nsduh[ which(nsduh$year=='2015'),]
+summary(nsduh2015$year)
+dep2015logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2015)
+summary(deplogit)
+  dep2015OR<-exp(cbind(OR = coef(dep2015logit), confint(dep2015logit)))
+  dep2015OR
+
+#2016
+nsduh2016 <- nsduh[ which(nsduh$year=='2016'),]
+summary(nsduh2016$year)
+dep2016logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2016)
+summary(deplogit)
+  dep2016OR<-exp(cbind(OR = coef(dep2016logit), confint(dep2016logit)))
+  dep2016OR
+
+#2017
+nsduh2017 <- nsduh[ which(nsduh$year=='2017'),]
+summary(nsduh2017$year)
+dep2017logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2017)
+summary(deplogit)
+  dep2017OR<-exp(cbind(OR = coef(dep2017logit), confint(dep2017logit)))
+  dep2017OR
+  
+#2018
+nsduh2018 <- nsduh[ which(nsduh$year=='2018'),]
+summary(nsduh2018$year)
+dep2018logit <- glm(ymdeyr ~ cigyr,family="binomial",data=nsduh2018)
+summary(deplogit)
+  dep2018OR<-exp(cbind(OR = coef(dep2018logit), confint(dep2018logit)))
+  dep2018OR
+```
